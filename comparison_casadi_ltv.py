@@ -166,6 +166,12 @@ nlpoptions = {
         "hessian_constant" : "yes"
     },
     "print_time" : False,
+    "ipopt.print_level" : 0,
+    "ipopt.max_cpu_time" : 60,
+    "ipopt.jac_c_constant" : "yes",
+    "ipopt.jac_d_constant" : "yes",
+    "ipopt.hessian_constant" : "yes",
+    "ipopt.linear_solver" : "ma27",
 }
 solver = casadi.nlpsol("solver",
     "ipopt", nlp, nlpoptions)
@@ -245,5 +251,4 @@ for i in range(Nx):
     ax.set_ylabel("State %d" % (i + 1))
 
 fig.tight_layout(pad=.5)
-import mpctools.plots # Need to grab one function to show plot.
-mpctools.plots.showandsave(fig,"comparison_casadi.pdf")
+fig.show()
