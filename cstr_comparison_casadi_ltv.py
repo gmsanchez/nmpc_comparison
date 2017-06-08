@@ -131,13 +131,23 @@ ode_casadi = casadi.Function(
 #xrk4 = x + Delta/6*(k1 + 2*k2 + 2*k3 + k4)    
 #ode_rk4_casadi = casadi.Function(
 #    "ode_rk4", [x,u], [xrk4])
-
 #<<ENDCHUNK>>
 
+# Steady-state values.
+cs = .878
+Ts = 324.5
+hs = .659
+Fs = .1
+Tcs = 300
+F0s = .1
+
+xs = np.array([0.878, 324.5, 0.659])
+us = np.array([300,   .1])
+
 # Define stage cost and terminal weight.
-Q = np.diag([1.0, 1.0, 1.0])
-R = np.diag([0.1, 0.1])
-Qn = np.diag([10.0, 10.0, 10.0])
+Q = .5*np.diag(xs**-2)
+R = 2*np.diag(us**-2)
+Qn = 10*Q
 lfunc = (casadi.mtimes([x.T, Q, x])
     + casadi.mtimes([u.T, R, u]))
 l = casadi.Function("l", [x,u], [lfunc])
@@ -156,15 +166,6 @@ Pf = casadi.Function("Pf", [x], [Pffunc])
 #<<ENDCHUNK>>
 
 # Make optimizers.
-# Steady-state values.
-cs = .878
-Ts = 324.5
-hs = .659
-Fs = .1
-Tcs = 300
-F0s = .1
-us = np.array([300,   .1])
-xs = np.array([cs, Ts, hs])
 x0 = np.array([.05*cs,.75*Ts,.5*hs])
 u0 = np.array([Tcs, Fs])
 umax = np.array([.05*Tcs,.15*Fs])
@@ -245,29 +246,34 @@ conub = np.zeros((Nx*Nt+Nu*(Nt-1),))
 #conlb = np.zeros((Nx*Nt,))
 #conub = np.zeros((Nx*Nt,))
 
-nlp = dict(x=var, f=obj, g=con, p=par)
-nlpoptions = {
-    "ipopt" : {
-        "print_level" : 0,
-        "max_cpu_time" : 60,
-        #"jac_c_constant" : "yes",
-        #"jac_d_constant" : "yes",
-        #"hessian_constant" : "yes"
-    },
-    "print_time" : False,
-    "ipopt.print_level" : 0,
-    "ipopt.max_cpu_time" : 60,
-    #"ipopt.jac_c_constant" : "yes",
-    #"ipopt.jac_d_constant" : "yes",
-    #"ipopt.hessian_constant" : "yes",
-    "ipopt.linear_solver" : "ma27",
-}
-solver = casadi.nlpsol("solver",
-    "ipopt", nlp, nlpoptions)
+#nlp = dict(x=var, f=obj, g=con, p=par)
+#nlpoptions = {
+#    "ipopt" : {
+#        "print_level" : 0,
+#        "max_cpu_time" : 60,
+#        #"jac_c_constant" : "yes",
+#        #"jac_d_constant" : "yes",
+#        #"hessian_constant" : "yes"
+#    },
+#    "print_time" : False,
+#    "ipopt.print_level" : 0,
+#    "ipopt.max_cpu_time" : 60,
+#    #"ipopt.jac_c_constant" : "yes",
+#    #"ipopt.jac_d_constant" : "yes",
+#    #"ipopt.hessian_constant" : "yes",
+#    "ipopt.linear_solver" : "ma27",
+#}
+#solver = casadi.nlpsol("solver",
+#    "ipopt", nlp, nlpoptions)
+
+
+qpoptions = {"printLevel" : 'none', "print_time" : False, 'sparse':True}
+qp = {'x':var, 'f':obj, 'g':con, 'p':par}
+solver = casadi.qpsol('solver', 'qpoases', qp, qpoptions)
 
 #<<ENDCHUNK>>
 
-varguess["x",0,:] = xs
+varguess["x",0,:] = x0
 for i in range(1,Nt+1):
     vdpargs = dict(x0=np.array(varguess["x",i-1,:]).flatten(),
                    p=u0)
@@ -285,7 +291,7 @@ u = np.zeros((Nsim,Nu))
 parguess["x_sp",:,:] = xs #np.array([0.878, 324.5, 0.659])
 parguess["u_sp",:,:] = us #np.array([300, 0.1])
 parguess["uprev",:,:] = us
-
+ptimes = np.zeros((Nsim+1,1))
 for t in range(Nsim):
     t0 = time.time()
     # Fix initial state.
@@ -303,14 +309,15 @@ for t in range(Nsim):
     
     # Solve nlp.    
     sol = solver(**args)
-    status = solver.stats()["return_status"]
+    status = "QP Status?" # solver.stats()["return_status"]
     optvar = var(sol["x"])
     
     parguess["Ad",:], parguess["Bd",:], parguess["fd",:] = zip(*map(_calc_lin_disc_wrapper_for_mp_map,
              zip([ode_casadi for _k in xrange(Nt)],
                   optvar["x"],
                   optvar["u"],
-                  [Delta for _k in xrange(Nt)] )))    
+                  [Delta for _k in xrange(Nt)] )))
+
     #<<ENDCHUNK>>    
     t1 = time.time()
     # Print stats.
@@ -318,7 +325,7 @@ for t in range(Nsim):
     u[t,:] = np.array(optvar["u",0,:]).flatten()
     parguess["uprev",:,:] = u[t,:]
     #<<ENDCHUNK>>
-
+    ptimes[t] = t1-t0
     # Simulate.
     vdpargs = dict(x0=x[t,:],
                    p=u[t,:])

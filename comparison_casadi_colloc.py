@@ -12,7 +12,7 @@ import time
 d = 3
 
 # Get collocation points
-tau_root = [0]+casadi.collocation_points(d, 'legendre')
+tau_root = [0]+casadi.collocation_points(d, 'radau')
 
 # Coefficients of the collocation equation
 C = np.zeros((d+1,d+1))
@@ -45,8 +45,8 @@ for j in range(d+1):
 
 
 # Define model and get simulator.
-Delta = .5
-Nt = 20
+Delta = .25
+Nt = 10
 Nx = 2
 Nu = 1
 # Number of collocation points
@@ -195,6 +195,7 @@ times = Delta*Nsim*np.linspace(0,1,Nsim+1)
 x = np.zeros((Nsim+1,Nx))
 x[0,:] = x0
 u = np.zeros((Nsim,Nu))
+ptimes = np.zeros((Nsim+1,1))
 for t in range(Nsim):
     t0 = time.time()
     # Fix initial state.    
@@ -220,7 +221,7 @@ for t in range(Nsim):
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
     u[t,:] = optvar["u",0,:]
-    
+    ptimes[t] = t1-t0
     #<<ENDCHUNK>>    
     
     # Simulate.

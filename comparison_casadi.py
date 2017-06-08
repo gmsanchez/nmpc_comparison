@@ -10,7 +10,7 @@ import time
 
 # Define model and get simulator.
 Delta = .25
-Nt = 20
+Nt = 10
 Nx = 2
 Nu = 1
 def ode(x,u):
@@ -123,6 +123,7 @@ times = Delta*Nsim*np.linspace(0,1,Nsim+1)
 x = np.zeros((Nsim+1,Nx))
 x[0,:] = x0
 u = np.zeros((Nsim,Nu))
+ptimes = np.zeros((Nsim+1,1))
 for t in range(Nsim):
     t0 = time.time()
     # Fix initial state.    
@@ -148,7 +149,7 @@ for t in range(Nsim):
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
     u[t,:] = optvar["u",0,:]
-    
+    ptimes[t] = t1-t0
     #<<ENDCHUNK>>    
     
     # Simulate.

@@ -66,7 +66,7 @@ def _calc_lin_disc_wrapper_for_mp_map_2(item):
 pool = multiprocessing.Pool()
 # Define model and get simulator.
 Delta = .25
-Nt = 5
+Nt = 10
 Nx = 2
 Nu = 1
 def ode(x,u,w=0):
@@ -221,6 +221,7 @@ times = Delta*Nsim*np.linspace(0,1,Nsim+1)
 x = np.zeros((Nsim+1,Nx))
 x[0,:] = x0
 u = np.zeros((Nsim,Nu))
+ptimes = np.zeros((Nsim+1,1))
 for t in range(Nsim):
     t0 = time.time()
     # Fix initial state.
@@ -247,7 +248,7 @@ for t in range(Nsim):
     # _fc = casadi.blocksplit(outMap[2],Nx,1)[0]
 
     if t==0:    
-        parguess["Ad",:], parguess["Bd",:], parguess["fd",:] = zip(*pool.map(_calc_lin_disc_wrapper_for_mp_map_2,
+        parguess["Ad",:], parguess["Bd",:], parguess["fd",:] = zip(*map(_calc_lin_disc_wrapper_for_mp_map_2,
                  zip(casadi.blocksplit(outMap[0],Nx,Nx)[0],
                      casadi.blocksplit(outMap[1],Nx,Nu)[0],
                      casadi.blocksplit(outMap[2],Nx,1)[0],
@@ -270,7 +271,7 @@ for t in range(Nsim):
     # Print stats.
     print "%d: %s in %.4f seconds" % (t,status, t1 - t0)
     u[t,:] = optvar["u",0,:]
-    
+    ptimes[t] = t1-t0
     #<<ENDCHUNK>>
 
     # Simulate.

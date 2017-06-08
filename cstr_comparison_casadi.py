@@ -202,6 +202,7 @@ parguess["x_sp",:,:] = xs #np.array([0.878, 324.5, 0.659])
 parguess["u_sp",:,:] = us #np.array([300, 0.1])
 parguess["uprev",:,:] = us
 u = np.zeros((Nsim,Nu))
+ptimes = np.zeros((Nsim+1,1))
 for t in range(Nsim):
     t0 = time.time()
     # Fix initial state.    
@@ -230,7 +231,7 @@ for t in range(Nsim):
     u[t,:] = np.array(
         optvar["u",0,:]).flatten()
     parguess["uprev",:,:] = u[t,:]
-
+    ptimes[t] = t1-t0
 
     
     #<<ENDCHUNK>>    
