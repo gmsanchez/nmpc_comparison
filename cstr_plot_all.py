@@ -36,7 +36,7 @@ for v in range(Nx):
         
         pltScale = 0.1
         (minlim,maxlim) = ax.get_xlim()
-        offset = .5*pltScale*(maxlim - minlim)
+        offset = .05*pltScale*(maxlim - minlim)
         ax.set_xlim(minlim - offset, maxlim + offset)
         (minlim,maxlim) = ax.get_ylim()
         offset = .5*pltScale*(maxlim - minlim)
@@ -65,7 +65,7 @@ for v in range(Nu):
         
     pltScale = 0.1
     (minlim,maxlim) = ax.get_xlim()
-    offset = .5*pltScale*(maxlim - minlim)
+    offset = .05*pltScale*(maxlim - minlim)
     ax.set_xlim(minlim - offset, maxlim + offset)
     (minlim,maxlim) = ax.get_ylim()
     offset = .5*pltScale*(maxlim - minlim)
@@ -94,7 +94,7 @@ for i in range(len(methods)):
     
 pltScale = 0.1
 (minlim,maxlim) = ax.get_xlim()
-offset = .5*pltScale*(maxlim - minlim)
+offset = .05*pltScale*(maxlim - minlim)
 ax.set_xlim(minlim - offset, maxlim + offset)
 (minlim,maxlim) = ax.get_ylim()
 offset = .5*pltScale*(maxlim - minlim)

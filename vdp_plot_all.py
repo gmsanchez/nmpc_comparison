@@ -34,17 +34,17 @@ for v in range(Nx):
         ax.set_ylabel(r"$x_%d$"%(v+1),fontsize=xlabelsize)
         ax.set_xlabel(r"Time [s]",fontsize=ylabelsize) 
         
-        pltScale = 0.1
-        (minlim,maxlim) = ax.get_xlim()
-        offset = .5*pltScale*(maxlim - minlim)
-        ax.set_xlim(minlim - offset, maxlim + offset)
-        (minlim,maxlim) = ax.get_ylim()
-        offset = .5*pltScale*(maxlim - minlim)
-        ax.set_ylim(minlim - offset, maxlim + offset)
-        plt.tight_layout()
-        plt.draw()
-        
-        plt.savefig("vdp_x_%d.pdf"%(v+1),format='PDF')
+    pltScale = 0.1
+    (minlim,maxlim) = ax.get_xlim()
+    offset = .05*pltScale*(maxlim - minlim)
+    ax.set_xlim(minlim - offset, maxlim + offset)
+    (minlim,maxlim) = ax.get_ylim()
+    offset = .5*pltScale*(maxlim - minlim)
+    ax.set_ylim(minlim - offset, maxlim + offset)
+    plt.tight_layout()
+    plt.draw()
+    
+    plt.savefig("vdp_x_%d.pdf"%(v+1),format='PDF')
         
 
 for v in range(Nu):
@@ -63,17 +63,17 @@ for v in range(Nu):
         ax.set_ylabel(r"$u_%d$"%(v+1),fontsize=xlabelsize)
         ax.set_xlabel(r"Time [s]",fontsize=ylabelsize) 
         
-        pltScale = 0.1
-        (minlim,maxlim) = ax.get_xlim()
-        offset = .5*pltScale*(maxlim - minlim)
-        ax.set_xlim(minlim - offset, maxlim + offset)
-        (minlim,maxlim) = ax.get_ylim()
-        offset = .5*pltScale*(maxlim - minlim)
-        ax.set_ylim(minlim - offset, maxlim + offset)
-        plt.tight_layout()
-        plt.draw()
+    pltScale = 0.1
+    (minlim,maxlim) = ax.get_xlim()
+    offset = .05*pltScale*(maxlim - minlim)
+    ax.set_xlim(minlim - offset, maxlim + offset)
+    (minlim,maxlim) = ax.get_ylim()
+    offset = .5*pltScale*(maxlim - minlim)
+    ax.set_ylim(minlim - offset, maxlim + offset)
+    plt.tight_layout()
+    plt.draw()
 
-        plt.savefig("vdp_u_%d.pdf"%(v+1),format='PDF')
+    plt.savefig("vdp_u_%d.pdf"%(v+1),format='PDF')
 
 fig = plt.figure()
 for i in range(len(methods)):
@@ -89,17 +89,17 @@ for i in range(len(methods)):
     
     ax.set_ylabel(r"Execution time [s]",fontsize=14)
     ax.set_xlabel(r"Time [s]",fontsize=ylabelsize) 
+    print "Mean process time for %s: %.5f"%(methods[i], np.mean(T[methods[i]][:-1]))
     
-    pltScale = 0.05
-    (minlim,maxlim) = ax.get_xlim()
-    offset = .5*pltScale*(maxlim - minlim)
-    ax.set_xlim(minlim - offset, maxlim + offset)
+pltScale = 0.05
+(minlim,maxlim) = ax.get_xlim()
+offset = .5*pltScale*(maxlim - minlim)
+ax.set_xlim(minlim - offset, maxlim + offset)
 #    (minlim,maxlim) = ax.get_ylim()
 #    offset = .5*pltScale*(maxlim - minlim)
 #    ax.set_ylim(minlim - offset, maxlim + offset)
-    plt.tight_layout()
-    plt.draw()
+plt.tight_layout()
+plt.draw()
+
+plt.savefig("vdp_proc_time.pdf",format='PDF')
     
-    plt.savefig("vdp_proc_time.pdf",format='PDF')
-    
-    print "Mean process time for %s: %.5f"%(methods[i], np.mean(T[methods[i]][:-1]))
